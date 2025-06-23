@@ -1,0 +1,51 @@
+# nao precisa da versao do compose; docker v2
+
+# containers
+services:
+  minio:
+    image: minio/minio # img do docker hub
+    ports: # portas (container:host)
+      - "9000:9000" # porta p/ api
+      - "9090:9090" # porta p/ interface web
+    environment: # variaveis. ex: usuario e senha
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    command: server /data --console-address ":9090"
+    volumes: # diretorios do hd
+
+  hive-metastore:
+    image: bitnami/hive-metastore
+    ports:
+      - "9083:9083"
+    environment:
+      HIVE_METASTORE_DATABASE_HOST: metastore-db
+      HIVE_METASTORE_DATABASE_PORT_NUMBER: 5432
+      HIVE_METASTORE_DATABASE_NAME: metastore
+      HIVE_METASTORE_DATABASE_USER: metastore
+      HIVE_METASTORE_DATABASE_PASSWORD: metastorepass
+    depends_on: # dependencia
+      - metastore-db  
+
+  metastore-db:
+    image: postgres:13
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: metastore
+      POSTGRES_USER: metastore
+      POSTGRES_PASSWORD: metastorepass
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
+      -./minio_data:/data
+
+  trino:
+    image: trinodb/trino
+    ports:
+      - "8080:8080" # web 
+    depends_on:
+      - hive-metastore
+
+  # metabase
+  # airflow-webserver
+  # airflow-scheduler
+  # airflor-db
