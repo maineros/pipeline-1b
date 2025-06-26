@@ -1,0 +1,2 @@
+# ignorar a pasta interna do minio
+**/.minio.sys/
