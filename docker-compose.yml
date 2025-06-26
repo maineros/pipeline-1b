@@ -14,34 +14,36 @@ services:
     volumes: # diretorios do hd
       - ./data_lake:/data
 
-  hive-metastore:
-    image: apache/hive:4.0.0
-    command: "hive --service metastore"
-    ports:
-      - "9083:9083"
-    depends_on:
-      - metastore-db
-    environment:
-      HIVE_METASTORE_DB_TYPE: postgres
-      SERVICE_NAME: metastore  
+  # demais conteineres
 
-  metastore-db:
-    image: postgres:13
-    ports:
-      - "5432:5432"
-    environment:
-      POSTGRES_DB: metastore
-      POSTGRES_USER: hive
-      POSTGRES_PASSWORD: hivepass
-    volumes:
-      - ./metastore-data:/var/lib/postgresql/data
+  # hive-metastore:
+  #   image: apache/hive:4.0.0
+  #   command: "hive --service metastore"
+  #   ports:
+  #     - "9083:9083"
+  #   depends_on:
+  #     - metastore-db
+  #   environment:
+  #     HIVE_METASTORE_DB_TYPE: postgres
+  #     SERVICE_NAME: metastore  
 
-  trino:
-    image: trinodb/trino
-    ports:
-      - "8080:8080" # web 
-    depends_on:
-      - hive-metastore
+  # metastore-db:
+  #   image: postgres:13
+  #   ports:
+  #     - "5432:5432"
+  #   environment:
+  #     POSTGRES_DB: metastore
+  #     POSTGRES_USER: hive
+  #     POSTGRES_PASSWORD: hivepass
+  #   volumes:
+  #     - ./metastore-data:/var/lib/postgresql/data
+
+  # trino:
+  #   image: trinodb/trino
+  #   ports:
+  #     - "8080:8080" # web 
+  #   depends_on:
+  #     - hive-metastore
 
   # metabase opcional
   # airflow-webserver
