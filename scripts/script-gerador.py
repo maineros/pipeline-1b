@@ -1,21 +1,20 @@
 import polars as pl
 from faker import Faker
 import random
-from datetime import datetime, timedelta
+from datetime import datetime
 import os
 
 fake = Faker()
 Faker.seed(42)
 random.seed(42)
 
-# teste local com menor quantidade de linhas
-NUM_LINHAS = 10_000_000
+# teste local com menor quantidade de linhas (10_000_000)
 BATCH_SIZE = 100_000
 NUM_BATCHES = 100
 
-# NUM_LINHAS = 1_000_000_000  # 1 bilhao de linhas
-# BATCH_SIZE = 10_000_000     # tamanho de cada lote
-# NUM_BATCHES = NUM_LINHAS // BATCH_SIZE
+# 1 bilhao de linhas (1_000_000_000) 
+# BATCH_SIZE = 10_000_000 # tamanho de cada lote
+# NUM_BATCHES = 100
 
 # categorias ficticias
 merchant_categories = ['food', 'electronics', 'clothing', 'transport', 'health']
