@@ -1,7 +1,7 @@
 # containers
 services:
   minio:
-    image: quay.io/minio/minio:RELEASE.2025-02-03T21-03-04Z-cpuv1 # img do docker hub fornecida pelos tutores
+    image: minio/minio:RELEASE.2025-02-03T21-03-04Z-cpuv1 # img do docker hub fornecida pelos tutores
     ports: # portas (container:host)
       - "9000:9000" # porta p/ api
       - "9090:9090" # porta p/ interface web
@@ -12,36 +12,34 @@ services:
     volumes: # diretorios 
       - ./data_lake:/data
 
+  hive-metastore:
+    image: apache/hive:4.0.1 # imagem mais recente no docker hub
+    command: "hive --service metastore"
+    ports:
+      - "9083:9083"
+    depends_on:
+      - metastore-db
+    environment:
+      HIVE_METASTORE_DB_TYPE: postgres
+      SERVICE_NAME: metastore  
+
+  metastore-db:
+    image: postgres:13
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: metastore
+      POSTGRES_USER: hive
+      POSTGRES_PASSWORD: hivepass
+    volumes:
+      - ./metastore-data:/var/lib/postgresql/data
+
+  trino:
+    image: trinodb/trino
+    ports:
+      - "8080:8080" # web 
+
   # demais conteineres
-
-  # hive-metastore:
-  #   image: apache/hive:4.0.0 # testando imagens diferentes
-  #   command: "hive --service metastore"
-  #   ports:
-  #     - "9083:9083"
-  #   depends_on:
-  #     - metastore-db
-  #   environment:
-  #     HIVE_METASTORE_DB_TYPE: postgres
-  #     SERVICE_NAME: metastore  
-
-  # metastore-db:
-  #   image: postgres:13
-  #   ports:
-  #     - "5432:5432"
-  #   environment:
-  #     POSTGRES_DB: metastore
-  #     POSTGRES_USER: hive
-  #     POSTGRES_PASSWORD: hivepass
-  #   volumes:
-  #     - ./metastore-data:/var/lib/postgresql/data
-
-  # trino:
-  #   image: trinodb/trino
-  #   ports:
-  #     - "8080:8080" # web 
-  #   depends_on:
-  #     - hive-metastore
 
   # metabase opcional
   # airflow-webserver
