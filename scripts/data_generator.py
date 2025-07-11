@@ -37,15 +37,15 @@ def gerar_lote(batch_num):
     })
 
 # salvar em vários arquivos parquet (um por lote)
-os.makedirs("data_lake/landing-zone", exist_ok=True)
+os.makedirs("data_lake/staging", exist_ok=True)
 
 for i in range(NUM_BATCHES):
     df = gerar_lote(i)
-    path = f"data_lake/landing-zone/transactions_batch_{i}.parquet"
+    path = f"data_lake/staging/transactions_batch_{i}.parquet"
     df.write_parquet(path)
     print(f"Lote {i+1} salvo em {path}")
 
     # ADD: registrar no arquivo de log pra manter o tracking da execucao do script
     # inicialmente, para testes: se o script for interrompido, saberemos a partir de onde retomar
-    with open("log_geracao_dados.txt", "a") as log_file:
+    with open("logs/log_geracao_dados.txt", "a") as log_file:
         log_file.write(f"{datetime.now()} - Lote {i+1}/{NUM_BATCHES} salvo em {path}\n")
