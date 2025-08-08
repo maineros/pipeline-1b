@@ -2,7 +2,7 @@ import duckdb
 import pandas as pd
 
 # Esse é o caminho para acessar os arquivos Parquet 
-parquet_path = 'data_lake/landing-zone/*.parquet'
+parquet_path = 'data_lake/staging/*.parquet'
 
 # Aqui vamos nos conectar com o DuckBD
 con = duckdb.connect()
