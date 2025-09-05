@@ -12,36 +12,56 @@ services:
     volumes: # diretorios 
       - ./data_lake:/data
 
-  hive-metastore:
-    image: apache/hive:4.0.1 # imagem mais recente no docker hub
-    command: "hive --service metastore"
-    ports:
-      - "9083:9083"
-    depends_on:
-      - metastore-db
-    environment:
-      HIVE_METASTORE_DB_TYPE: postgres
-      SERVICE_NAME: metastore  
-
   metastore-db:
-    image: postgres:13
+    image: postgres:15
+    container_name: metastore-db
+    environment:
+      POSTGRES_USER: hive
+      POSTGRES_PASSWORD: hive
+      POSTGRES_DB: metastore
     ports:
       - "5432:5432"
-    environment:
-      POSTGRES_DB: metastore
-      POSTGRES_USER: hive
-      POSTGRES_PASSWORD: hivepass
     volumes:
-      - ./metastore-data:/var/lib/postgresql/data
+      - metastore-data:/var/lib/postgresql/data
+
+  hive-metastore:
+    image: apache/hive:4.0.1
+    container_name: hive-metastore
+    command: "hive --service metastore"
+    environment:
+      HIVE_METASTORE_DB_TYPE: postgres
+      HIVE_METASTORE_DB_HOST: metastore-db
+      HIVE_METASTORE_DB_PORT: 5432
+      HIVE_METASTORE_DB_NAME: metastore
+      HIVE_METASTORE_DB_USER: hive
+      HIVE_METASTORE_DB_PASS: hive
+      SERVICE_NAME: metastore
+    depends_on:
+      - metastore-db
+    ports:
+      - "9083:9083"
 
   trino:
     image: trinodb/trino
     ports:
-      - "8080:8080" # web 
+      - "8080:8080" # web
+    volumes:
+      - ./trino/etc/catalog:/etc/trino/catalog
 
+  trino-cli:
+    image: trinodb/trino
+    depends_on:
+      - trino
+    entrypoint: ["trino", "--server", "http://trino:8080", "--user", "mainero"]
+    stdin_open: true
+    tty: true
+    
   # demais conteineres
 
   # metabase opcional
   # airflow-webserver
   # airflow-scheduler
   # airflor-db
+
+volumes:
+  metastore-data:
